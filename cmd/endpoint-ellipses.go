@@ -26,6 +26,7 @@ import (
 
 	"github.com/minio/minio-go/v7/pkg/set"
 	"github.com/minio/minio/internal/config"
+	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/ellipses"
 	"github.com/minio/pkg/env"
 )
@@ -340,12 +341,14 @@ var globalCustomErasureDriveCount = false
 func createServerEndpoints(serverAddr string, args ...string) (
 	endpointServerPools EndpointServerPools, setupType SetupType, err error,
 ) {
+	logger.Info("NSK::createserverendpoints")
 	if len(args) == 0 {
 		return nil, -1, errInvalidArgument
 	}
 
 	ok := true
 	for _, arg := range args {
+		logger.Info(fmt.Sprintf("NSK arg: %s\n", arg))
 		ok = ok && !ellipses.HasEllipses(arg)
 	}
 
@@ -370,6 +373,7 @@ func createServerEndpoints(serverAddr string, args ...string) (
 			CmdLine:      strings.Join(args, " "),
 			Platform:     fmt.Sprintf("OS: %s | Arch: %s", runtime.GOOS, runtime.GOARCH),
 		})
+		logger.Info(fmt.Sprintf("NSK: endpointServerPools: %+v", endpointServerPools))
 		setupType = newSetupType
 		return endpointServerPools, setupType, nil
 	}

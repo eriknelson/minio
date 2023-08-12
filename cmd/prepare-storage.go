@@ -148,6 +148,7 @@ func isServerResolvable(endpoint Endpoint, timeout time.Duration) error {
 // time. additionally make sure to close all the disks used in this attempt.
 func connectLoadInitFormats(verboseLogging bool, firstDisk bool, endpoints Endpoints, poolCount, setCount, setDriveCount int, deploymentID, distributionAlgo string) (storageDisks []StorageAPI, format *formatErasureV3, err error) {
 	// Initialize all storage disks
+	logger.Info("NSK::connectLoadInitFormats")
 	storageDisks, errs := initStorageDisksWithErrors(endpoints, true)
 
 	defer func(storageDisks []StorageAPI) {
@@ -158,6 +159,7 @@ func connectLoadInitFormats(verboseLogging bool, firstDisk bool, endpoints Endpo
 
 	for i, err := range errs {
 		if err != nil && !errors.Is(err, errXLBackend) {
+			logger.Info("First error handling block, error: %+v", err)
 			if errors.Is(err, errDiskNotFound) && verboseLogging {
 				if globalEndpoints.NEndpoints() > 1 {
 					logger.Error("Unable to connect to %s: %v", endpoints[i], isServerResolvable(endpoints[i], time.Second))
@@ -165,9 +167,12 @@ func connectLoadInitFormats(verboseLogging bool, firstDisk bool, endpoints Endpo
 					logger.Fatal(err, "Unable to connect to %s: %v", endpoints[i], isServerResolvable(endpoints[i], time.Second))
 				}
 			} else {
+				logger.Info("Second error handling block error +v %+v", err)
 				if globalEndpoints.NEndpoints() > 1 {
 					logger.Error("Unable to use the drive %s: %v", endpoints[i], err)
 				} else {
+					logger.Info("Second error handling block error +v %+v", err)
+					logger.Info("Second error handling block error +v %v", err)
 					logger.Fatal(errInvalidArgument, "Unable to use the drive %s: %v", endpoints[i], err)
 				}
 			}
@@ -273,6 +278,7 @@ func waitForFormatErasure(firstDisk bool, endpoints Endpoints, poolCount, setCou
 	if len(endpoints) == 0 || setCount == 0 || setDriveCount == 0 {
 		return nil, nil, errInvalidArgument
 	}
+	logger.Info("NSK::waitForFormatErasure")
 
 	// prepare getElapsedTime() to calculate elapsed time since we started trying formatting disks.
 	// All times are rounded to avoid showing milli, micro and nano seconds

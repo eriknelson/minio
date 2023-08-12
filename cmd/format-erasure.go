@@ -665,6 +665,7 @@ func closeStorageDisks(storageDisks ...StorageAPI) {
 // Errors are returned for each endpoint with matching index.
 func initStorageDisksWithErrors(endpoints Endpoints, healthCheck bool) ([]StorageAPI, []error) {
 	// Bootstrap disks.
+	logger.Info("initStorageDisksWithErrors")
 	storageDisks := make([]StorageAPI, len(endpoints))
 	g := errgroup.WithNErrs(len(endpoints))
 	for index := range endpoints {

@@ -244,7 +244,14 @@ func serverHandleCmdArgs(ctx *cli.Context) {
 	// Register root CAs for remote ENVs
 	env.RegisterGlobalCAs(globalRootCAs)
 
+	logger.Info("NSK: hello world, creating server endpoints:")
 	globalEndpoints, setupType, err = createServerEndpoints(globalMinioAddr, serverCmdArgs(ctx)...)
+	logger.Info(fmt.Sprintf("NSK globalEndpoints: %+v", globalEndpoints))
+	if err != nil {
+		logger.Info(fmt.Sprintf("NSK got error creating server endpoints: %+v", err))
+	} else {
+		logger.Info("NSK: All good, globalEndpoints setup")
+	}
 	logger.FatalIf(err, "Invalid command line arguments")
 	globalNodes = globalEndpoints.GetNodes()
 

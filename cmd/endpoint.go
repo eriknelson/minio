@@ -1016,6 +1016,10 @@ func CreatePoolEndpoints(serverAddr string, poolArgs ...[][]string) ([]Endpoints
 
 // CreateEndpoints - validates and creates new endpoints for given args.
 func CreateEndpoints(serverAddr string, args ...[]string) (Endpoints, SetupType, error) {
+	logger.Info(fmt.Sprintf("serverAddr: %s", serverAddr))
+	for argIdx, arg := range args {
+		logger.Info(fmt.Sprintf("CreateEndpoints::arg: %d, %+v", argIdx, arg))
+	}
 	var endpoints Endpoints
 	var setupType SetupType
 	var err error
@@ -1029,8 +1033,10 @@ func CreateEndpoints(serverAddr string, args ...[]string) (Endpoints, SetupType,
 
 	// For single arg, return single drive setup.
 	if len(args) == 1 && len(args[0]) == 1 {
+		logger.Info("First branch")
 		var endpoint Endpoint
 		endpoint, err = NewEndpoint(args[0][0])
+		logger.Info(fmt.Sprintf("%+v", endpoint))
 		if err != nil {
 			return endpoints, setupType, err
 		}
@@ -1044,6 +1050,8 @@ func CreateEndpoints(serverAddr string, args ...[]string) (Endpoints, SetupType,
 		endpoint.SetPoolIndex(0)
 		endpoint.SetSetIndex(0)
 		endpoint.SetDiskIndex(0)
+
+		logger.Info(fmt.Sprintf("NSK: The endpoint is configured: %+v", endpoint))
 
 		endpoints = append(endpoints, endpoint)
 		setupType = ErasureSDSetupType

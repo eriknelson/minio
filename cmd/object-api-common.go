@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/dustin/go-humanize"
+	"github.com/minio/minio/internal/logger"
 )
 
 const (
@@ -57,11 +58,14 @@ var globalCacheObjectAPI CacheObjectLayer
 
 // Depending on the disk type network or local, initialize storage API.
 func newStorageAPI(endpoint Endpoint, healthCheck bool) (storage StorageAPI, err error) {
+	logger.Info("newStorageAPI")
 	if endpoint.IsLocal {
 		storage, err := newXLStorage(endpoint, healthCheck)
 		if err != nil {
+			logger.Info("Error XL Storage")
 			return nil, err
 		}
+		logger.Info("No errors, doing ID check")
 		return newXLStorageDiskIDCheck(storage, healthCheck), nil
 	}
 

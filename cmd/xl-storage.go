@@ -168,20 +168,26 @@ func getValidPath(path string) (string, error) {
 	// Disallow relative paths, figure out absolute paths.
 	path, err = filepath.Abs(path)
 	if err != nil {
+		logger.Info("first")
 		return path, err
 	}
 
 	fi, err := Lstat(path)
 	if err != nil && !osIsNotExist(err) {
+		logger.Info("second")
 		return path, err
 	}
 	if osIsNotExist(err) {
 		// Disk not found create it.
+		logger.Info("third")
+		// NSK: This is it!!!!!
 		if err = mkdirAll(path, 0o777); err != nil {
+			logger.Info("failed to mkdirall")
 			return path, err
 		}
 	}
 	if fi != nil && !fi.IsDir() {
+		logger.Info("final")
 		return path, errDiskNotDir
 	}
 
@@ -213,6 +219,7 @@ func newLocalXLStorage(path string) (*xlStorage, error) {
 func newXLStorage(ep Endpoint, cleanUp bool) (s *xlStorage, err error) {
 	path := ep.Path
 	if path, err = getValidPath(path); err != nil {
+		logger.Info("Invalid path.")
 		return nil, err
 	}
 
@@ -221,9 +228,13 @@ func newXLStorage(ep Endpoint, cleanUp bool) (s *xlStorage, err error) {
 		if globalRootDiskThreshold > 0 {
 			// Use MINIO_ROOTDISK_THRESHOLD_SIZE to figure out if
 			// this disk is a root disk.
+			logger.Info("Getting disk info")
 			info, err := disk.GetInfo(path)
 			if err != nil {
+				logger.Info("Got error: %+v", err)
 				return nil, err
+			} else {
+				logger.Info("No issue getting disk info")
 			}
 
 			// treat those disks with size less than or equal to the
